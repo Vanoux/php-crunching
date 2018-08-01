@@ -41,15 +41,17 @@ echo "=> " . count(array_filter($dico, function($x){
 
 <h4>Combien de mots contiennent la lettre « w » ?</h4>
 <?php // Même process que la question d'avant (à essayer avec une autre methode --> foreach?)
-// stripos() -> Cherche la position de la première occurrence (exemple ici "w") dans une chaîne sans tenir compte de la casse (contrairement à strpo())
+//stristr() —> Version insensible à la casse de strstr() =>  Trouve la première occurrence dans une chaîne
 $nbWord = 0; // nb de mots = à 0
 foreach($dico as $w){ 
-    if (stripos($w, 'w')){ // Si pour chaque mots parcouru dans $dico, on trouve la première occurrence de $w = 'w'
+    if (stristr($w, 'w')){ // Si pour chaque mots parcouru dans $dico, on trouve la première occurrence de $w = 'w'
         $nbWord++;         // alors l'incrementer à $word (pour comptabiliser les mots)
     };  
 } echo "=> " . $nbWord . "<br>";// afficher le nombre de mots avec le lettre 'w' => résultat 347 ?
 
-// ou bien en reprenant le process de la question d'avant :
+// ou bien en reprenant le process de la question d'avant 
+// avec stripos() -> Cherche la position de la première occurrence (exemple ici "w") dans une chaîne sans tenir compte de la casse (contrairement à strpo())
+// PB avec stripos() = ne compte pas les w en début de mots car cherche la position et cette facon de faire ne tient pas compte de la position 0 car false!
 echo " et avec la 2ème méthode => " . count(array_filter($dico, function($w){
     return stripos($w, 'w'); // résultat => 347 ! ok!
 }))
@@ -59,7 +61,8 @@ echo " et avec la 2ème méthode => " . count(array_filter($dico, function($w){
 <h4>Combien de mots finissent par la lettre « q » ?</h4>
 <?php 
 $nbWord = 0;
-foreach($dico as $q){ //strrchr() —> Trouve la dernière occurrence d'un caractère dans une chaîne
+foreach($dico as $q){ 
+    //strrchr() —> Trouve la dernière occurrence d'un caractère dans une chaîne
     // if(strrchr($q, 'q')){
     //      $nbWord++; // resultat => 16849 ???? ca fait beaucoup!!
     // }
@@ -72,8 +75,144 @@ foreach($dico as $q){ //strrchr() —> Trouve la dernière occurrence d'un carac
 
 // ou bien avec la 2ème méthode :
 echo " et avec la 2ème méthode => " . count(array_filter($disco, function($q){
-    return substr($q, -1)=='q'; // resutat = 0 ?? 
+    return substr($q, -1)=='q'; // resutat = 0 , pourquoi?? 
 }))
+
+?>
+
+<hr>
+
+<h1>Liste de films</h1>
+
+<?php
+$string = file_get_contents("films.json", FILE_USE_INCLUDE_PATH);
+$brut = json_decode($string, true);
+$top = $brut["feed"]["entry"]; # liste de films
+?>
+
+<h4>Afficher le top 10 des films sous forme de liste : </h4>
+<?php
+for($i=0; $i<=9; $i++){
+    echo $i+1 . " : " . $top [$i]['im:name']['label'] . "<br>";
+}
+?>
+
+<h4>Quel est le classement du film « Gravity » ?</h4>
+<?php
+// Avec un for :
+// for($i=0; $i<=100; $i++){
+//     if($top [$i]['im:name']['label']=='Gravity'){
+//         echo $top [$i]['im:name']['label'] . " est à la " . $i . " ème position . ";
+//     } 
+// }
+
+// Avec un foreach :
+foreach($top as $key => $value){
+    if($value['im:name']['label']=="Gravity"){
+        echo $value['im:name']['label'] . " est à la " . $key . "ème position";
+    }
+}
+?>
+
+<h4>Quel est le réalisateur du film « The LEGO Movie » ?</h4>
+<?php
+// Avec un for :
+// for($i=0; $i<=100; $i++){
+//     if($top [$i]['im:name']['label']=='The LEGO Movie'){
+//         echo "Les réalisateurs de ce film sont : " . $top [$i]['im:artist']['label'] ;
+//     } 
+// }
+// Avec un foreach :
+foreach($top as $key => $value){
+    if($value['im:name']['label']=='The LEGO Movie'){
+        echo "Les réalisateurs de ce film sont : " . $value['im:artist']['label'];
+    }
+}
+?>
+
+<h4>Combien de films sont sortis avant 2000 ?</h4>
+<?php
+// Avec un for :
+for($i=0; $i<=100; $i++){
+    if($top [$i]['im:releaseDate']['label'][0]<2){
+        echo $top [$i]['im:name']['label']. "<br>";
+        $film++;
+    } 
+}echo "Le nombre de films sortis avant 2000 : " . $film .  "<br>";
+
+// Avec un foreach (resultat 12 films ???)
+// foreach($top as $key => $value){
+//     if($value['im:releaseDate']['label'][0]<2){
+//         echo $value['im:name']['label'] . "<br>";
+//         $film++;
+//     }
+// }echo "Le nombre de films sortis avant 2000 : " . $film .  "<br>";
+?>
+
+<h4>Quel est le film le plus récent ? Le plus vieux ?</h4>
+<?php
+//$array = [];
+// for($i=0; $i<100; $i++){
+//     $date = substr($top[$i]['im:releaseDate']['label'], 0, 10);
+//        $array[$i]=$date;
+       //echo $array[$i] . "<br>"; 
+           
+    //} 
+    // echo max($array) . "<br>";
+    // echo min($array) . "<br>";
+
+foreach ($top as $key => $value){
+    $youngOld[$value ['im:name'] ['label']] = substr($value ['im:releaseDate']['label'], 0, 10) . "<br>";
+} //var_dump($youngOld); 
+foreach ($youngOld as $key => $value){
+    if ($value == max($youngOld)){
+        echo  "Nom du film le plus récent : " . $key . " => Date de Sortie : " . max($youngOld) . "<br>";
+    }
+    if ($value == min($youngOld)){
+        echo "Nom du film le plus vieux : " . $key . " => Date de Sortie : " . min($youngOld) ;
+    }
+}
+
+?>
+
+<h4>Quelle est la catégorie de films la plus représentée ?</h4>
+<?php
+// foreach ($top as $key => $value){
+//     $kind[$value ['category']['attribute'] ['label']] ;
+//     var_dump($kind);
+// }
+foreach ($top as $key => $value) {
+//$array[svalue ['category']['attributes']['label']] = array_count_values($array); //array_count_value() = Compte le nombre de valeurs d'un tableau
+    $array[] = $value['category']['attributes']['label'];
+    //var_dump($array);
+    //print_r(array_count_values($array)); 
+}
+foreach ($array as $key => $value) {
+    if ($value == max($array)) {
+    echo $value;		
+    }
+}
+
+
+?>
+
+<h4>Quel est le réalisateur le plus présent dans le top100 ?</h4>
+<?php
+
+?>
+
+<h4>Combien cela coûterait-il d'acheter le top10 sur iTunes ? de le louer ?</h4>
+<?php
+
+?>
+
+<h4>Quel est le mois ayant vu le plus de sorties au cinéma ?</h4>
+<?php
+
+?>
+
+<h4>Quels sont les 10 meilleurs films à voir en ayant un budget limité ?</h4>
+<?php
 
 ?>
 
