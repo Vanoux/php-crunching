@@ -81,6 +81,7 @@ echo " et avec la 2ème méthode => " . count(array_filter($disco, function($q){
 ?>
 
 <hr>
+<!--########################################################################################################################-->
 
 <h1>Liste de films</h1>
 
@@ -92,9 +93,16 @@ $top = $brut["feed"]["entry"]; # liste de films
 
 <h4>Afficher le top 10 des films sous forme de liste : </h4>
 <?php
-for($i=0; $i<=9; $i++){
-    echo $i+1 . " : " . $top [$i]['im:name']['label'] . "<br>";
-}
+//Avec un for :
+// for($i=0; $i<=9; $i++){
+//     echo $i+1 . " : " . $top [$i]['im:name']['label'] . "<br>";
+// }
+// Avec un foreach :
+foreach ($top as $key => $value){
+    if ($key < 10){
+    echo $key+1 . " : " . $value['im:name']['label'] . "<br>";
+    }
+} 
 ?>
 
 <h4>Quel est le classement du film « Gravity » ?</h4>
@@ -177,43 +185,78 @@ foreach ($youngOld as $key => $value){
 
 <h4>Quelle est la catégorie de films la plus représentée ?</h4>
 <?php
-// foreach ($top as $key => $value){
-//     $kind[$value ['category']['attribute'] ['label']] ;
-//     var_dump($kind);
-// }
 foreach ($top as $key => $value) {
-//$array[svalue ['category']['attributes']['label']] = array_count_values($array); //array_count_value() = Compte le nombre de valeurs d'un tableau
+    //$array[svalue ['category']['attributes']['label']] = array_count_values($array); //array_count_value() = Compte le nombre de valeurs d'un tableau
     $array[] = $value['category']['attributes']['label'];
     //var_dump($array);
-    //print_r(array_count_values($array)); 
+    $arrayCount = array_count_values($array);//array_count_value() = Compte le nombre de valeurs d'un tableau
 }
-foreach ($array as $key => $value) {
-    if ($value == max($array)) {
-    echo $value;		
+//print_r($arrayCount);
+
+foreach ($arrayCount as $key => $value) {
+    if ($value == max($arrayCount)) {
+    echo $key;		
     }
 }
-
-
 ?>
 
 <h4>Quel est le réalisateur le plus présent dans le top100 ?</h4>
 <?php
+foreach ($top as $key => $value){
+    $director[] = $value['im:artist']['label'];
+    $arrayCount = array_count_values($director);
+} //print_r($arrayCount);
 
+foreach ($arrayCount as $key => $value){
+    if ($value == max($arrayCount)){
+        echo $key;
+    }
+}
 ?>
 
 <h4>Combien cela coûterait-il d'acheter le top10 sur iTunes ? de le louer ?</h4>
 <?php
-
+foreach ($top as $key => $value){
+    if($key < 10){
+        $sum += $value['im:price']['attributes']['amount']; // pareil que $sum = $sum + $value.....
+        //echo  $value['im:price']['attributes']['amount']  . "<br>";    
+    }  
+} echo $sum . "<br>";
 ?>
 
 <h4>Quel est le mois ayant vu le plus de sorties au cinéma ?</h4>
 <?php
-
+foreach ($top as $key => $value){
+    $array = explode (" ", $value['im:releaseDate']['attributes']['label']);//explode = "explose" une string de plusieurs mots à chaques espaces " " pour en faire un array.
+    $month[] = $array[0];
+    $arrayCount = array_count_values($month);
+} 
+//print_r($arrayCount);
+foreach ($arrayCount as $key => $value){
+    if ($value == max($arrayCount)){
+        echo "=> " . $key . " : " . $value . " sorties" . "<br>";
+    }
+}
 ?>
 
 <h4>Quels sont les 10 meilleurs films à voir en ayant un budget limité ?</h4>
 <?php
+foreach ($top as $key => $value){
+    $price[] = $value['im:price']['attributes']['amount'];
+    $arrayCount = array_count_values($price);
+   // $movies[] = $value['im:name']['label'];
+}
+// print_r($arrayCount);
+//print_r($movies);
 
+foreach ($arrayCount as $key => $value){
+    //echo $key . " => " . $value . "<br>";
+    if($key < 8){
+        echo "Il y a " . $value . " films à " . $key . " $ " . "<br>";
+    }  
+}
+
+    
 ?>
 
 </body>
