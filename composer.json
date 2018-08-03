@@ -1,0 +1,10 @@
+{
+    "name": "root/php-crunching",
+    "authors": [
+        {
+            "name": "Vanoux",
+            "email": "vanessa.roux891@orange.fr"
+        }
+    ],
+    "require": {}
+}

@@ -5,7 +5,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Dictionnaire</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- <link rel="stylesheet" type="text/css" media="screen" href="main.css" /> -->
 </head>
 <body>
  
@@ -72,11 +71,6 @@ foreach($dico as $q){
         $nbWord++; // resultat = 8 ?? 
     }  
 } echo "=> " . $nbWord . "<br>";
-
-// ou bien avec la 2ème méthode :
-echo " et avec la 2ème méthode => " . count(array_filter($disco, function($q){
-    return substr($q, -1)=='q'; // resutat = 0 , pourquoi?? 
-}))
 
 ?>
 
@@ -180,16 +174,15 @@ foreach ($youngOld as $key => $value){
         echo "Nom du film le plus vieux : " . $key . " => Date de Sortie : " . min($youngOld) ;
     }
 }
-
 ?>
 
 <h4>Quelle est la catégorie de films la plus représentée ?</h4>
 <?php
 foreach ($top as $key => $value) {
-    //$array[svalue ['category']['attributes']['label']] = array_count_values($array); //array_count_value() = Compte le nombre de valeurs d'un tableau
+    //$array[svalue ['category']['attributes']['label']] = array_count_values($array);
     $array[] = $value['category']['attributes']['label'];
     //var_dump($array);
-    $arrayCount = array_count_values($array);//array_count_value() = Compte le nombre de valeurs d'un tableau
+    $arrayCount = array_count_values($array);//array_count_value() = Compte le nombre de valeurs d'un tableau en un tableau
 }
 //print_r($arrayCount);
 
@@ -218,10 +211,10 @@ foreach ($arrayCount as $key => $value){
 <?php
 foreach ($top as $key => $value){
     if($key < 10){
-        $sum += $value['im:price']['attributes']['amount']; // pareil que $sum = $sum + $value.....
-        //echo  $value['im:price']['attributes']['amount']  . "<br>";    
+        $sum += $value['im:price']['attributes']['amount']; // pareil que $sum = $sum + $value.....    
     }  
-} echo $sum . "<br>";
+}
+echo $sum . "<br>";
 ?>
 
 <h4>Quel est le mois ayant vu le plus de sorties au cinéma ?</h4>
@@ -242,21 +235,13 @@ foreach ($arrayCount as $key => $value){
 <h4>Quels sont les 10 meilleurs films à voir en ayant un budget limité ?</h4>
 <?php
 foreach ($top as $key => $value){
-    $price[] = $value['im:price']['attributes']['amount'];
-    $arrayCount = array_count_values($price);
-   // $movies[] = $value['im:name']['label'];
-}
-// print_r($arrayCount);
-//print_r($movies);
-
-foreach ($arrayCount as $key => $value){
-    //echo $key . " => " . $value . "<br>";
-    if($key < 8){
-        echo "Il y a " . $value . " films à " . $key . " $ " . "<br>";
-    }  
-}
-
-    
+    $price = $value['im:price']['attributes']['amount'];
+   
+   if ($price <8 && $movie < 10){
+       $movie = $value['im:name']['label'];
+       echo "(Position " . $key . ") " . $movie . " => " . (($price*10)/10) . "$ " . "<br>";
+   }
+}    
 ?>
 
 </body>
